@@ -232,7 +232,7 @@ void swift::performLLVMOptimizations(IRGenOptions &Opts, llvm::Module *Module,
 
   // If we're generating a profile, add the lowering pass now.
   if (Opts.GenerateProfile)
-    ModulePasses.add(createInstrProfilingPass());
+    ModulePasses.add(createInstrProfilingLegacyPass());
 
   PMBuilder.populateModulePassManager(ModulePasses);
 
