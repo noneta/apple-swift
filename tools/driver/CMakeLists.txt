@@ -6,7 +6,8 @@ add_swift_executable(swift
   LINK_LIBRARIES
     swiftDriver
     swiftFrontendTool
-    LLVMDebugInfoCodeView
+  COMPONENT_DEPENDS
+    DebugInfoCodeView
 )
 
 target_link_libraries(swift edit)
