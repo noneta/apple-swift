@@ -22,6 +22,9 @@
 #include <mutex>
 #include <assert.h>
 
+#if defined(_MSC_VER)
+#define U_EXPORT __declspec(dllimport)
+#endif
 #include <unicode/ustring.h>
 #include <unicode/ucol.h>
 #include <unicode/ucoleitr.h>
