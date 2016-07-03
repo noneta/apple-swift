@@ -81,6 +81,13 @@ public struct _FDInputStream {
   }
 }
 
+#if os(Windows) && !CYGWIN
+public struct _Stderr {
+}
+
+public struct _FDOutputStream {
+}
+#else
 public struct _Stderr : TextOutputStream {
   public init() {}
 
@@ -128,3 +135,4 @@ public struct _FDOutputStream : TextOutputStream {
     isClosed = true
   }
 }
+#endif
