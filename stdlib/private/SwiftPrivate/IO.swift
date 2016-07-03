@@ -81,7 +81,7 @@ public struct _FDInputStream {
   }
 }
 
-public struct _Stderr : OutputStream {
+public struct _Stderr /* : OutputStream */ {
   public init() {}
 
   public mutating func write(_ string: String) {
@@ -91,7 +91,7 @@ public struct _Stderr : OutputStream {
   }
 }
 
-public struct _FDOutputStream : OutputStream {
+public struct _FDOutputStream /* : OutputStream */ {
   public let fd: CInt
   public var isClosed: Bool = false
 
