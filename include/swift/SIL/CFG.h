@@ -95,9 +95,14 @@ template <> struct GraphTraits<swift::SILFunction*>
 
   static NodeRef getEntryNode(GraphType F) { return &F->front(); }
 
-  typedef swift::SILFunction::iterator nodes_iterator;
-  static nodes_iterator nodes_begin(GraphType F) { return F->begin(); }
-  static nodes_iterator nodes_end(GraphType F) { return F->end(); }
+  typedef pointer_iterator<swift::SILFunction::iterator> nodes_iterator;
+  static nodes_iterator nodes_begin(GraphType F) {
+    return nodes_iterator(F->begin());
+  }
+  static nodes_iterator nodes_end(GraphType F) {
+    return nodes_iterator(F->end());
+  }
+
   static unsigned size(GraphType F) { return F->size(); }
 };
 
