@@ -8,8 +8,8 @@ macro(swift_common_standalone_build_config_llvm product is_cross_compiling)
   precondition_translate_flag(${product}_PATH_TO_LLVM_BUILD PATH_TO_LLVM_BUILD)
 
   set(SWIFT_LLVM_CMAKE_PATHS
-      "${PATH_TO_LLVM_BUILD}/share/llvm/cmake"
-      "${PATH_TO_LLVM_BUILD}/lib/cmake/llvm")
+      "${PATH_TO_LLVM_BUILD}/lib/cmake/llvm"
+      "${PATH_TO_LLVM_BUILD}/share/llvm/cmake")
 
   # Add all LLVM CMake paths to our cmake module path.
   foreach(path ${SWIFT_LLVM_CMAKE_PATHS})
@@ -50,8 +50,6 @@ macro(swift_common_standalone_build_config_llvm product is_cross_compiling)
   precondition_translate_flag(LLVM_BUILD_MAIN_INCLUDE_DIR LLVM_MAIN_INCLUDE_DIR)
   precondition_translate_flag(LLVM_BUILD_BINARY_DIR LLVM_BINARY_DIR)
   precondition_translate_flag(LLVM_BUILD_MAIN_SRC_DIR LLVM_MAIN_SRC_DIR)
-  precondition(LLVM_LIBRARY_DIRS)
-  escape_path_for_xcode("${LLVM_BUILD_TYPE}" "${LLVM_LIBRARY_DIRS}" LLVM_LIBRARY_DIRS)
 
   # This could be computed using ${CMAKE_CFG_INTDIR} if we want to link Swift
   # against a matching LLVM build configuration.  However, we usually want to be
@@ -93,7 +91,7 @@ macro(swift_common_standalone_build_config_llvm product is_cross_compiling)
     "${PACKAGE_VERSION_MAJOR}.${PACKAGE_VERSION_MINOR}" CACHE STRING
     "Version number that will be placed into the libclang library , in the form XX.YY")
 
-  foreach (INCLUDE_DIR ${LLVM_INCLUDE_DIRS})
+  foreach (INCLUDE_DIR ${LLVM_INCLUDE_DIR})
     escape_path_for_xcode("${LLVM_BUILD_TYPE}" "${INCLUDE_DIR}" INCLUDE_DIR)
     include_directories(${INCLUDE_DIR})
   endforeach ()
