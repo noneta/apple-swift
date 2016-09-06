@@ -385,7 +385,7 @@ bool swift::rotateLoop(SILLoop *L, DominanceInfo *DT, SILLoopInfo *LI,
 
   if (ShouldVerify) {
     DT->verify();
-    LI->verify();
+    LI->verify(*DT);
     Latch->getParent()->verify();
   }
 

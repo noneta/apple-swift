@@ -73,7 +73,7 @@ public:
   SILLoopInfoBase &getBase() { return LI; }
 
   /// Verify loop information. This is very expensive.
-  void verify() const;
+  void verify(const llvm::DominatorTreeBase<SILBasicBlock> &) const;
 
   /// The iterator interface to the top-level loops in the current
   /// function.

@@ -81,6 +81,7 @@ bool SILLoop::canDuplicate(SILInstruction *I) const {
   return true;
 }
 
-void SILLoopInfo::verify() const {
-  LI.verify();
+void SILLoopInfo::verify(
+    const llvm::DominatorTreeBase<SILBasicBlock> &DomTree) const {
+  LI.verify(DomTree);
 }
