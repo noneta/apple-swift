@@ -1474,7 +1474,7 @@ llvm::DIType *IRGenDebugInfo::createType(DebugTypeInfo DbgTy,
       clang::SourceManager &ClangSM =
           CI.getClangASTContext().getSourceManager();
       L.Line = ClangSM.getPresumedLineNumber(ClangSrcLoc);
-      L.Filename = ClangSM.getBufferName(ClangSrcLoc);
+      L.Filename = ClangSM.getBufferName(ClangSrcLoc).data();
 
       // Use "__ObjC" as default for implicit decls.
       // FIXME: Do something more clever based on the decl's mangled name.

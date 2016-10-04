@@ -157,8 +157,8 @@ namespace {
            /*null-terminated=*/true);
     }
 
-    const char *getBufferIdentifier() const override {
-      return name.c_str();
+    llvm::StringRef getBufferIdentifier() const override {
+      return name;
     }
 
     BufferKind getBufferKind() const override {
@@ -2228,7 +2228,7 @@ StringRef ClangModuleUnit::getFilename() const {
   if (!clangModule)
     return "<imports>";
   if (const clang::FileEntry *F = clangModule->getASTFile())
-    if (F->getName())
+    if (!F->getName().empty())
       return F->getName();
   return StringRef();
 }
