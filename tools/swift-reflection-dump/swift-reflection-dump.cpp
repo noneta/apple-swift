@@ -50,17 +50,16 @@ enum class ActionType {
 };
 
 namespace options {
-static llvm::cl::opt<ActionType>
-Action(llvm::cl::desc("Mode:"),
-       llvm::cl::values(
-         clEnumValN(ActionType::DumpReflectionSections,
-                    "dump-reflection-sections",
-                    "Dump the field reflection section"),
-         clEnumValN(ActionType::DumpTypeLowering,
-                    "dump-type-lowering",
-                    "Dump the field layout for typeref strings read from stdin"),
-         clEnumValEnd),
-       llvm::cl::init(ActionType::DumpReflectionSections));
+static llvm::cl::opt<ActionType> Action(
+    llvm::cl::desc("Mode:"),
+    llvm::cl::values(
+        clEnumValN(ActionType::DumpReflectionSections,
+                   "dump-reflection-sections",
+                   "Dump the field reflection section"),
+        clEnumValN(
+            ActionType::DumpTypeLowering, "dump-type-lowering",
+            "Dump the field layout for typeref strings read from stdin")),
+    llvm::cl::init(ActionType::DumpReflectionSections));
 
 static llvm::cl::list<std::string>
 BinaryFilename("binary-filename", llvm::cl::desc("Filenames of the binary files"),

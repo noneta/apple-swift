@@ -96,16 +96,14 @@ static llvm::cl::opt<OptGroup> OptimizationGroup(
     llvm::cl::values(clEnumValN(OptGroup::Diagnostics, "diagnostics",
                                 "Run diagnostic passes"),
                      clEnumValN(OptGroup::Performance, "O",
-                                "Run performance passes"),
-                     clEnumValEnd),
+                                "Run performance passes")),
     llvm::cl::init(OptGroup::Unknown));
 
-static llvm::cl::list<PassKind>
-Passes(llvm::cl::desc("Passes:"),
-       llvm::cl::values(
+static llvm::cl::list<PassKind> Passes(llvm::cl::desc("Passes:"),
+                                       llvm::cl::values(
 #define PASS(ID, NAME, DESCRIPTION) clEnumValN(PassKind::ID, NAME, DESCRIPTION),
 #include "swift/SILOptimizer/PassManager/Passes.def"
-       clEnumValEnd));
+                                           clEnumValN(0, "", "")));
 
 static llvm::cl::opt<bool>
 PrintStats("print-stats", llvm::cl::desc("Print various statistics"));

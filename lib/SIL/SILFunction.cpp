@@ -309,17 +309,17 @@ namespace {
 enum class LongLineBehavior { None, Truncate, Wrap };
 } // end anonymous namespace
 static llvm::cl::opt<LongLineBehavior>
-LLBehavior("view-cfg-long-line-behavior",
-           llvm::cl::init(LongLineBehavior::Truncate),
-           llvm::cl::desc("Behavior when line width is greater than the "
-                          "value provided my -view-cfg-max-columns "
-                          "option"),
-           llvm::cl::values(
-               clEnumValN(LongLineBehavior::None, "none", "Print everything"),
-               clEnumValN(LongLineBehavior::Truncate, "truncate",
-                          "Truncate long lines"),
-               clEnumValN(LongLineBehavior::Wrap, "wrap", "Wrap long lines"),
-               clEnumValEnd));
+    LLBehavior("view-cfg-long-line-behavior",
+               llvm::cl::init(LongLineBehavior::Truncate),
+               llvm::cl::desc("Behavior when line width is greater than the "
+                              "value provided my -view-cfg-max-columns "
+                              "option"),
+               llvm::cl::values(clEnumValN(LongLineBehavior::None, "none",
+                                           "Print everything"),
+                                clEnumValN(LongLineBehavior::Truncate,
+                                           "truncate", "Truncate long lines"),
+                                clEnumValN(LongLineBehavior::Wrap, "wrap",
+                                           "Wrap long lines")));
 
 static llvm::cl::opt<bool>
 RemoveUseListComments("view-cfg-remove-use-list-comments",

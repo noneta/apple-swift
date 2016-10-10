@@ -212,8 +212,7 @@ Action(llvm::cl::desc("Mode:"), llvm::cl::init(ActionType::None),
                       "Print group names in a module"),
            clEnumValN(ActionType::Range,
                       "range",
-                      "Print information about a given range"),
-           clEnumValEnd));
+                      "Print information about a given range")));
 
 static llvm::cl::opt<std::string>
 SourceFilename("source-filename", llvm::cl::desc("Name of the source file"));
@@ -467,18 +466,16 @@ SkipUnavailable("skip-unavailable",
                 llvm::cl::desc("Don't print unavailable declarations"),
                 llvm::cl::init(false));
 
-static llvm::cl::opt<Accessibility>
-AccessibilityFilter(
+static llvm::cl::opt<Accessibility> AccessibilityFilter(
     llvm::cl::desc("Accessibility filter:"),
     llvm::cl::init(Accessibility::Private),
     llvm::cl::values(
         clEnumValN(Accessibility::Private, "accessibility-filter-private",
-            "Print all declarations"),
+                   "Print all declarations"),
         clEnumValN(Accessibility::Internal, "accessibility-filter-internal",
-            "Print internal and public declarations"),
+                   "Print internal and public declarations"),
         clEnumValN(Accessibility::Public, "accessibility-filter-public",
-            "Print public declarations"),
-        clEnumValEnd));
+                   "Print public declarations")));
 
 static llvm::cl::opt<bool>
 SynthesizeExtension("synthesize-extension",

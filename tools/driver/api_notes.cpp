@@ -34,18 +34,15 @@ int apinotes_main(ArrayRef<const char *> Args) {
   // -version and -help) will be hidden.
   static cl::OptionCategory APINotesCategory("API Notes options");
 
-  static cl::opt<api_notes::ActionType>
-  Action(cl::desc("Mode:"), cl::init(api_notes::ActionType::None),
-         cl::values(
-                    clEnumValN(api_notes::ActionType::YAMLToBinary,
+  static cl::opt<api_notes::ActionType> Action(
+      cl::desc("Mode:"), cl::init(api_notes::ActionType::None),
+      cl::values(clEnumValN(api_notes::ActionType::YAMLToBinary,
                             "yaml-to-binary", "Convert YAML to binary format"),
-                    clEnumValN(api_notes::ActionType::BinaryToYAML,
-                               "binary-to-yaml",
-                               "Convert binary format to YAML"),
-                    clEnumValN(api_notes::ActionType::Dump,
-                            "dump", "Parse and dump the output"),
-                    clEnumValEnd),
-         cl::cat(APINotesCategory));
+                 clEnumValN(api_notes::ActionType::BinaryToYAML,
+                            "binary-to-yaml", "Convert binary format to YAML"),
+                 clEnumValN(api_notes::ActionType::Dump, "dump",
+                            "Parse and dump the output")),
+      cl::cat(APINotesCategory));
 
   static cl::opt<std::string>
   InputFilename(cl::Positional, cl::desc("<input file>"),
