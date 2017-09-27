@@ -189,21 +189,21 @@ namespace llvm {
       return LHS == RHS;
     }
   };
-  
+
   // An Identifier is "pointer like".
-  template<typename T> class PointerLikeTypeTraits;
-  template<>
-  class PointerLikeTypeTraits<swift::Identifier> {
-  public:
+  template <typename T> struct PointerLikeTypeTraits;
+
+  template <> struct PointerLikeTypeTraits<swift::Identifier> {
     static inline void *getAsVoidPointer(swift::Identifier I) {
       return const_cast<void *>(I.getAsOpaquePointer());
     }
     static inline swift::Identifier getFromVoidPointer(void *P) {
       return swift::Identifier::getFromOpaquePointer(P);
     }
+
     enum { NumLowBitsAvailable = 2 };
   };
-  
+
 } // end namespace llvm
 
 namespace swift {
@@ -333,16 +333,20 @@ template<> struct DenseMapInfo<swift::DeclBaseName> {
 };
 
 // A DeclBaseName is "pointer like".
-template <typename T> class PointerLikeTypeTraits;
-template <> class PointerLikeTypeTraits<swift::DeclBaseName> {
-public:
+template <typename T> struct PointerLikeTypeTraits;
+
+template <> struct PointerLikeTypeTraits<swift::DeclBaseName> {
   static inline void *getAsVoidPointer(swift::DeclBaseName D) {
     return const_cast<void *>(D.getAsOpaquePointer());
   }
   static inline swift::DeclBaseName getFromVoidPointer(void *P) {
     return swift::DeclBaseName::getFromOpaquePointer(P);
   }
-  enum { NumLowBitsAvailable = PointerLikeTypeTraits<swift::Identifier>::NumLowBitsAvailable };
+
+  enum {
+    NumLowBitsAvailable =
+        PointerLikeTypeTraits<swift::Identifier>::NumLowBitsAvailable
+  };
 };
 
 } // end namespace llvm
@@ -686,17 +690,18 @@ public:
 } // end namespace swift
 
 namespace llvm {
+
   // A DeclName is "pointer like".
-  template<typename T> class PointerLikeTypeTraits;
-  template<>
-  class PointerLikeTypeTraits<swift::DeclName> {
-  public:
+  template <typename T> struct PointerLikeTypeTraits;
+
+  template <> struct PointerLikeTypeTraits<swift::DeclName> {
     static inline void *getAsVoidPointer(swift::DeclName name) {
       return name.getOpaqueValue();
     }
     static inline swift::DeclName getFromVoidPointer(void *ptr) {
       return swift::DeclName::getFromOpaqueValue(ptr);
     }
+
     enum { NumLowBitsAvailable = 0 };
   };
 
@@ -717,16 +722,15 @@ namespace llvm {
   };
 
   // An ObjCSelector is "pointer like".
-  template<typename T> class PointerLikeTypeTraits;
-  template<>
-  class PointerLikeTypeTraits<swift::ObjCSelector> {
-  public:
+  template <typename T> struct PointerLikeTypeTraits;
+  template <> struct PointerLikeTypeTraits<swift::ObjCSelector> {
     static inline void *getAsVoidPointer(swift::ObjCSelector name) {
       return name.getOpaqueValue();
     }
     static inline swift::ObjCSelector getFromVoidPointer(void *ptr) {
       return swift::ObjCSelector::getFromOpaqueValue(ptr);
     }
+
     enum { NumLowBitsAvailable = 0 };
   };
 

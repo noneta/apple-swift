@@ -71,16 +71,17 @@ namespace llvm {
     }
   };
 
-  template <class T> class PointerLikeTypeTraits;
+  template <class T> struct PointerLikeTypeTraits;
 }
 
 /// Declare the expected alignment of pointers to the given type.
 /// This macro should be invoked from a top-level file context.
-#define LLVM_DECLARE_TYPE_ALIGNMENT(CLASS, ALIGNMENT)     \
-namespace llvm {                                          \
-template <> class PointerLikeTypeTraits<CLASS*>           \
-  : public MoreAlignedPointerTraits<CLASS, ALIGNMENT> {}; \
-}
+#define LLVM_DECLARE_TYPE_ALIGNMENT(CLASS, ALIGNMENT)                          \
+  namespace llvm {                                                             \
+  template <>                                                                  \
+  struct PointerLikeTypeTraits<CLASS *>                                        \
+      : MoreAlignedPointerTraits<CLASS, ALIGNMENT> {};                         \
+  }
 
 LLVM_DECLARE_TYPE_ALIGNMENT(swift::Decl, swift::DeclAlignInBits)
 LLVM_DECLARE_TYPE_ALIGNMENT(swift::AbstractStorageDecl, swift::DeclAlignInBits)

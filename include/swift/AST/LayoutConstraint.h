@@ -395,14 +395,14 @@ template <> struct DenseMapInfo<swift::LayoutConstraint> {
 };
 
 // A LayoutConstraint is "pointer like".
-template <> class PointerLikeTypeTraits<swift::LayoutConstraint> {
-public:
+template <> struct PointerLikeTypeTraits<swift::LayoutConstraint> {
   static inline void *getAsVoidPointer(swift::LayoutConstraint I) {
     return (void *)I.getPointer();
   }
   static inline swift::LayoutConstraint getFromVoidPointer(void *P) {
     return (swift::LayoutConstraintInfo *)P;
   }
+
   enum { NumLowBitsAvailable = swift::TypeAlignInBits };
 };
 } // end namespace llvm

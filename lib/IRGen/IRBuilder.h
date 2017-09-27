@@ -307,21 +307,17 @@ public:
 } // end namespace swift
 
 namespace llvm {
-  template <> class PointerLikeTypeTraits<swift::irgen::IRBuilder::StableIP> {
-    typedef swift::irgen::IRBuilder::StableIP type;
-  public:
-    static void *getAsVoidPointer(type IP) {
-      return IP.getOpaqueValue();
-    }
-    static type getFromVoidPointer(void *p) {
-      return type::getFromOpaqueValue(p);
-    }
+template <> struct PointerLikeTypeTraits<swift::irgen::IRBuilder::StableIP> {
+  typedef swift::irgen::IRBuilder::StableIP type;
 
-    // The number of bits available are the min of the two pointer types.
-    enum {
-      NumLowBitsAvailable = type::NumLowBitsAvailable
-    };
-  };
+  static void *getAsVoidPointer(type IP) { return IP.getOpaqueValue(); }
+  static type getFromVoidPointer(void *p) {
+    return type::getFromOpaqueValue(p);
+  }
+
+  // The number of bits available are the min of the two pointer types.
+  enum { NumLowBitsAvailable = type::NumLowBitsAvailable };
+};
 }
 
 #endif

@@ -233,15 +233,14 @@ namespace llvm {
 
 /// ValueBase * is always at least eight-byte aligned; make the three tag bits
 /// available through PointerLikeTypeTraits.
-template<>
-class PointerLikeTypeTraits<swift::ValueBase *> {
-public:
+template <> struct PointerLikeTypeTraits<swift::ValueBase *> {
   static inline void *getAsVoidPointer(swift::ValueBase *I) {
-    return (void*)I;
+    return (void *)I;
   }
   static inline swift::ValueBase *getFromVoidPointer(void *P) {
     return (swift::ValueBase *)P;
   }
+
   enum { NumLowBitsAvailable = 3 };
 };
 
@@ -811,12 +810,10 @@ namespace llvm {
   };
 
   /// SILValue is a PointerLikeType.
-  template<> class PointerLikeTypeTraits<::swift::SILValue> {
+  template <> struct PointerLikeTypeTraits<::swift::SILValue> {
     using SILValue = ::swift::SILValue;
-  public:
-    static void *getAsVoidPointer(SILValue v) {
-      return v.getOpaqueValue();
-    }
+
+    static void *getAsVoidPointer(SILValue v) { return v.getOpaqueValue(); }
     static SILValue getFromVoidPointer(void *p) {
       return SILValue::getFromOpaqueValue(p);
     }

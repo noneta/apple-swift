@@ -149,21 +149,16 @@ SILBasicBlock *GeneralizedUser::getParent() const {
 }
 
 namespace llvm {
-
-template <> class PointerLikeTypeTraits<GeneralizedUser> {
-
-public:
+template <> struct PointerLikeTypeTraits<GeneralizedUser> {
   static void *getAsVoidPointer(GeneralizedUser v) {
     return v.getAsOpaqueValue();
   }
-
   static GeneralizedUser getFromVoidPointer(void *p) {
     return GeneralizedUser::getFromOpaqueValue(p);
   }
 
   enum { NumLowBitsAvailable = GeneralizedUser::NumLowBitsAvailable };
 };
-
 } // namespace llvm
 
 //===----------------------------------------------------------------------===//

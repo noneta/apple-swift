@@ -638,39 +638,35 @@ namespace llvm {
   };
 
   // A Type is "pointer like".
-  template<>
-  class PointerLikeTypeTraits<swift::Type> {
-  public:
+  template <> struct PointerLikeTypeTraits<swift::Type> {
     static inline void *getAsVoidPointer(swift::Type I) {
-      return (void*)I.getPointer();
+      return (void *)I.getPointer();
     }
     static inline swift::Type getFromVoidPointer(void *P) {
-      return (swift::TypeBase*)P;
+      return (swift::TypeBase *)P;
     }
     enum { NumLowBitsAvailable = swift::TypeAlignInBits };
   };
-  
-  template<>
-  class PointerLikeTypeTraits<swift::CanType> :
-    public PointerLikeTypeTraits<swift::Type> {
-  public:
+
+  template <>
+  struct PointerLikeTypeTraits<swift::CanType>
+      : PointerLikeTypeTraits<swift::Type> {
     static inline swift::CanType getFromVoidPointer(void *P) {
-      return swift::CanType((swift::TypeBase*)P);
+      return swift::CanType((swift::TypeBase *)P);
     }
   };
 
-  template<>
-  class PointerLikeTypeTraits<swift::CanGenericSignature> {
-  public:
+  template <> struct PointerLikeTypeTraits<swift::CanGenericSignature> {
     static inline swift::CanGenericSignature getFromVoidPointer(void *P) {
-      return swift::CanGenericSignature((swift::GenericSignature*)P);
+      return swift::CanGenericSignature((swift::GenericSignature *)P);
     }
     static inline void *getAsVoidPointer(swift::CanGenericSignature S) {
-      return (void*)S.getPointer();
+      return (void *)S.getPointer();
     }
+
     enum { NumLowBitsAvailable = swift::TypeAlignInBits };
   };
-  
+
 } // end namespace llvm
 
 #endif

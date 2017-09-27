@@ -377,22 +377,20 @@ public:
 
 /// Allow stable_iterators to be put in things like TinyPtrVectors.
 namespace llvm {
-  template <>
-  class PointerLikeTypeTraits<
-                      swift::DiverseStackBase::stable_iterator::AsPointer> {
-    using AsPointer = swift::DiverseStackBase::stable_iterator::AsPointer;
-  public:
-    static inline void *getAsVoidPointer(AsPointer ptr) {
-      return ptr.getAsVoidPointer();
-    }
-    static inline AsPointer getFromVoidPointer(void *ptr) {
-      return AsPointer::getFromVoidPointer(ptr);
-    }
+template <>
+struct PointerLikeTypeTraits<
+    swift::DiverseStackBase::stable_iterator::AsPointer> {
+  using AsPointer = swift::DiverseStackBase::stable_iterator::AsPointer;
 
-    enum {
-      NumLowBitsAvailable = AsPointer::NumLowBitsAvailable
-    };
-  };
-}
+  static inline void *getAsVoidPointer(AsPointer ptr) {
+    return ptr.getAsVoidPointer();
+  }
+  static inline AsPointer getFromVoidPointer(void *ptr) {
+    return AsPointer::getFromVoidPointer(ptr);
+  }
+
+  enum { NumLowBitsAvailable = AsPointer::NumLowBitsAvailable };
+};
+} // namespace llvm
 
 #endif // SWIFT_BASIC_DIVERSESTACK_H
