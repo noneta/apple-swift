@@ -2,7 +2,7 @@
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
   include(ExternalProject)
 
-  if(SWIFT_BUILD_SOURCEKIT)
+  if(SWIFT_BUILD_SOURCEKIT OR SWIFT_BUILD_SYNTAX)
     ExternalProject_Add(libdispatch
                         SOURCE_DIR
                           "${SWIFT_PATH_TO_LIBDISPATCH_SOURCE}"
@@ -61,5 +61,49 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
                             ${SWIFT_PATH_TO_LIBDISPATCH_BUILD}/${CMAKE_STATIC_LIBRARY_PREFIX}BlocksRuntime${CMAKE_STATIC_LIBRARY_SUFFIX}
                           INTERFACE_INCLUDE_DIRECTORIES
                             ${SWIFT_PATH_TO_LIBDISPATCH_SOURCE}/src/BlocksRuntime)
+
+
+  if(SWIFT_BUILD_SYNTAX)
+    ExternalProject_Add(SwiftFoundation
+                        SOURCE_DIR
+                          "${SWIFT_PATH_TO_FOUNDATION_SOURCE}"
+                        BINARY_DIR
+                          "${SWIFT_PATH_TO_FOUNDATION_BUILD}"
+                        CMAKE_ARGS
+                          -DCMAKE_C_COMPILER=${PATH_TO_CLANG_BUILD}/bin/clang
+                          -DCMAKE_CXX_COMPILER=${PATH_TO_CLANG_BUILD}/bin/clang++
+                          -DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
+                          -DCMAKE_SWIFT_COMPILER=$<TARGET_FILE:swift>c
+                          -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
+                          -DFOUNDATION_ENABLE_LIBDISPATCH=YES
+                          -DFOUNDATION_PATH_TO_LIBDISPATCH_SOURCE=${SWIFT_PATH_TO_LIBDISPATCH_SOURCE}
+                          -DFOUNDATION_PATH_TO_LIBDISPATCH_BUILD=${SWIFT_PATH_TO_LIBDISPATCH_BUILD}
+                        BUILD_BYPRODUCTS
+                          ${SWIFT_PATH_TO_FOUNDATION_BUILD}/${CMAKE_SHARED_LIBARY_PREFIX}Foundation${CMAKE_SHARED_LIBRARY_SUFFIX}
+                        STEP_TARGETS
+                          configure
+                        BUILD_ALWAYS
+                          1)
+
+    add_dependencies(SwiftFoundation
+                       libdispatch
+                       swift
+                       copy_shim_headers
+                       swiftCore-${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_LIB_SUBDIR}-${SWIFT_HOST_VARIANT_ARCH}
+                       swiftGlibc-${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_LIB_SUBDIR}-${SWIFT_HOST_VARIANT_ARCH}
+                       swiftSwiftOnoneSupport-${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_LIB_SUBDIR}-${SWIFT_HOST_VARIANT_ARCH}
+                       swiftCore-swiftmodule-${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_LIB_SUBDIR}-${SWIFT_HOST_VARIANT_ARCH}
+                       swiftGlibc-swiftmodule-${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_LIB_SUBDIR}-${SWIFT_HOST_VARIANT_ARCH}
+                       swiftSwiftOnoneSupport-swiftmodule-${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_LIB_SUBDIR}-${SWIFT_HOST_VARIANT_ARCH})
+  endif()
+
+  ExternalProject_Get_Property(SwiftFoundation install_dir)
+  add_library(Foundation SHARED IMPORTED)
+  set_target_properties(Foundation
+                        PROPERTIES
+                          IMPORTED_LOCATION
+                            ${SWIFT_PATH_TO_FOUNDATION_BUILD}/${CMAKE_SHARED_LIBRARY_PREFIX}Foundation${CMAKE_SHARED_LIBRARY_SUFFIX}
+                          IMPORTED_LINK_INTERFACE_LIBRARIES
+                            swiftCore-${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_LIB_SUBDIR}-${SWIFT_HOST_VARIANT_ARCH})
 endif()
 
