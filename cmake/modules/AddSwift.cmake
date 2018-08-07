@@ -1476,6 +1476,7 @@ function(add_swift_library name)
         PRIVATE_LINK_LIBRARIES
         SWIFT_COMPILE_FLAGS
         SWIFT_COMPILE_FLAGS_IOS
+        SWIFT_COMPILE_FLAGS_LINUX
         SWIFT_COMPILE_FLAGS_OSX
         SWIFT_COMPILE_FLAGS_TVOS
         SWIFT_COMPILE_FLAGS_WATCHOS
@@ -1703,6 +1704,9 @@ function(add_swift_library name)
         elseif("${sdk}" STREQUAL "WATCHOS" OR "${sdk}" STREQUAL "WATCHOS_SIMULATOR")
           list(APPEND swiftlib_swift_compile_flags_all
               ${SWIFTLIB_SWIFT_COMPILE_FLAGS_WATCHOS})
+        elseif("${sdk}" STREQUAL "LINUX")
+          list(APPEND swiftlib_swift_compile_flags_all
+               ${SWIFTLIB_SWIFT_COMPILE_FLAGS_LINUX})
         elseif("${sdk}" STREQUAL "WINDOWS")
           # FIXME(SR2005) static and shared are not mutually exclusive; however
           # since we do a single build of the sources, this doesn't work for
