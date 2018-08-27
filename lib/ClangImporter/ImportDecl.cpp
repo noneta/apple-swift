@@ -2356,7 +2356,7 @@ namespace {
               TypeAliasDecl *typealias = nullptr;
               typealias = Impl.createDeclWithClangNode<TypeAliasDecl>(
                             Decl, AccessLevel::Public,
-                            Impl.importSourceLoc(Decl->getLocStart()),
+                            Impl.importSourceLoc(Decl->getBeginLoc()),
                             SourceLoc(), Name,
                             Impl.importSourceLoc(Decl->getLocation()),
                             /*genericparams*/nullptr, DC);
@@ -2375,7 +2375,7 @@ namespace {
               TypeAliasDecl *typealias = nullptr;
               typealias = Impl.createDeclWithClangNode<TypeAliasDecl>(
                             Decl, AccessLevel::Public,
-                            Impl.importSourceLoc(Decl->getLocStart()),
+                            Impl.importSourceLoc(Decl->getBeginLoc()),
                             SourceLoc(), Name,
                             Impl.importSourceLoc(Decl->getLocation()),
                             /*genericparams*/nullptr, DC);
@@ -2443,7 +2443,7 @@ namespace {
       auto Loc = Impl.importSourceLoc(Decl->getLocation());
       auto Result = Impl.createDeclWithClangNode<TypeAliasDecl>(Decl,
                                       AccessLevel::Public,
-                                      Impl.importSourceLoc(Decl->getLocStart()),
+                                      Impl.importSourceLoc(Decl->getBeginLoc()),
                                       SourceLoc(), Name,
                                       Loc,
                                       /*genericparams*/nullptr, DC);
@@ -2584,7 +2584,7 @@ namespace {
         /// Basic information about the enum type we're building.
         Identifier enumName = name;
         DeclContext *enumDC = dc;
-        SourceLoc loc = Impl.importSourceLoc(decl->getLocStart());
+        SourceLoc loc = Impl.importSourceLoc(decl->getBeginLoc());
 
         // If this is an error enum, form the error wrapper type,
         // which is a struct containing an NSError instance.
@@ -3036,7 +3036,7 @@ namespace {
       auto name = importedName.getDeclName().getBaseIdentifier();
       auto result = Impl.createDeclWithClangNode<StructDecl>(decl,
                                  AccessLevel::Public,
-                                 Impl.importSourceLoc(decl->getLocStart()),
+                                 Impl.importSourceLoc(decl->getBeginLoc()),
                                  name,
                                  Impl.importSourceLoc(decl->getLocation()),
                                  None, nullptr, dc);
@@ -3360,7 +3360,7 @@ namespace {
                        /*IsStatic*/false,
                        VarDecl::Specifier::Var,
                        /*IsCaptureList*/false,
-                       Impl.importSourceLoc(decl->getLocStart()),
+                       Impl.importSourceLoc(decl->getBeginLoc()),
                        name, dc);
       result->setInterfaceType(type);
       result->setIsObjC(false);
@@ -4243,7 +4243,7 @@ namespace {
       if (!dc)
         return nullptr;
 
-      auto loc = Impl.importSourceLoc(decl->getLocStart());
+      auto loc = Impl.importSourceLoc(decl->getBeginLoc());
       auto result = ExtensionDecl::create(
                       Impl.SwiftContext, loc,
                       TypeLoc::withoutLoc(objcClass->getDeclaredType()),
@@ -4406,7 +4406,7 @@ namespace {
       // Create the protocol declaration and record it.
       auto result = Impl.createDeclWithClangNode<ProtocolDecl>(
           decl, AccessLevel::Public, dc,
-          Impl.importSourceLoc(decl->getLocStart()),
+          Impl.importSourceLoc(decl->getBeginLoc()),
           Impl.importSourceLoc(decl->getLocation()), name, None,
           /*TrailingWhere=*/nullptr);
       result->computeType();
@@ -4558,7 +4558,7 @@ namespace {
 
       // Create the class declaration and record it.
       auto result = Impl.createDeclWithClangNode<ClassDecl>(
-          decl, access, Impl.importSourceLoc(decl->getLocStart()), name,
+          decl, access, Impl.importSourceLoc(decl->getBeginLoc()), name,
           Impl.importSourceLoc(decl->getLocation()), None, nullptr, dc);
 
       // Import generic arguments, if any.
@@ -4883,7 +4883,7 @@ namespace {
       TypeAliasDecl *typealias = nullptr;
       typealias = Impl.createDeclWithClangNode<TypeAliasDecl>(
                     decl, AccessLevel::Public,
-                    Impl.importSourceLoc(decl->getLocStart()),
+                    Impl.importSourceLoc(decl->getBeginLoc()),
                     SourceLoc(), name,
                     Impl.importSourceLoc(decl->getLocation()),
                     /*genericparams=*/nullptr, dc);
@@ -5116,7 +5116,7 @@ Decl *SwiftDeclConverter::importCompatibilityTypeAlias(
 
   // Create the type alias.
   auto alias = Impl.createDeclWithClangNode<TypeAliasDecl>(
-      decl, AccessLevel::Public, Impl.importSourceLoc(decl->getLocStart()),
+      decl, AccessLevel::Public, Impl.importSourceLoc(decl->getBeginLoc()),
       SourceLoc(), compatibilityName.getDeclName().getBaseIdentifier(),
       Impl.importSourceLoc(decl->getLocation()), /*generic params*/nullptr, dc);
 
