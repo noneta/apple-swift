@@ -1937,7 +1937,6 @@ function(add_swift_library name)
         STATIC)
   set(ASL_single_parameter_options)
   set(ASL_multiple_parameter_options
-        C_COMPILE_FLAGS
         DEPENDS
         INTERFACE_LINK_LIBRARIES
         LINK_FLAGS
@@ -1973,8 +1972,6 @@ function(add_swift_library name)
                               ${ASL_LINK_LIBRARIES}
                             LLVM_COMPONENT_DEPENDS
                               ${ASL_LLVM_COMPONENT_DEPENDS}
-                            C_COMPILE_FLAGS
-                              ${ASL_C_COMPILE_FLAGS}
                             LINK_FLAGS
                               ${ASL_LINK_FLAGS}
                             INTERFACE_LINK_LIBRARIES
