@@ -1938,7 +1938,6 @@ function(add_swift_library name)
   set(ASL_single_parameter_options)
   set(ASL_multiple_parameter_options
         DEPENDS
-        INTERFACE_LINK_LIBRARIES
         LINK_FLAGS
         LINK_LIBS
         LINK_COMPONENTS)
@@ -1974,8 +1973,6 @@ function(add_swift_library name)
                               ${ASL_LINK_COMPONENTS}
                             LINK_FLAGS
                               ${ASL_LINK_FLAGS}
-                            INTERFACE_LINK_LIBRARIES
-                              ${ASL_INTERFACE_LINK_LIBRARIES}
                             INSTALL_IN_COMPONENT
                               dev)
 

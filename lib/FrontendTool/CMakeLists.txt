@@ -17,6 +17,9 @@ add_swift_library(swiftFrontendTool STATIC
     swiftFrontend
     swiftClangImporter
     swiftOption
-    clangAPINotes
-    clangBasic
 )
+target_link_libraries(swiftFrontendTool
+                      PRIVATE
+                        clangAPINotes
+                        clangBasic)
+
