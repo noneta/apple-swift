@@ -6,7 +6,7 @@ add_swift_library(swiftFrontendTool STATIC
   TextualInterfaceGeneration.cpp
   DEPENDS
     swift-syntax-generated-headers SwiftOptions
-  LINK_LIBRARIES
+  LINK_LIBS
     swiftIndex
     swiftIDE
     swiftTBDGen swiftIRGen swiftSIL swiftSILGen swiftSILOptimizer

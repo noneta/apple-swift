@@ -42,7 +42,7 @@ add_swift_library(swiftSIL STATIC
   SILWitnessTable.cpp
   TypeLowering.cpp
   ValueOwnershipKindClassifier.cpp
-  LINK_LIBRARIES
+  LINK_LIBS
     swiftSerialization
     swiftSema
 )

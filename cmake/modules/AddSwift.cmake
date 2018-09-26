@@ -1940,7 +1940,7 @@ function(add_swift_library name)
         DEPENDS
         INTERFACE_LINK_LIBRARIES
         LINK_FLAGS
-        LINK_LIBRARIES
+        LINK_LIBS
         LLVM_COMPONENT_DEPENDS)
 
   cmake_parse_arguments(ASL
@@ -1968,8 +1968,8 @@ function(add_swift_library name)
                               ${SWIFT_HOST_VARIANT_ARCH}
                             DEPENDS
                               ${ASL_DEPENDS}
-                            LINK_LIBRARIES
-                              ${ASL_LINK_LIBRARIES}
+                            LINK_LIBS
+                              ${ASL_LINK_LIBS}
                             LLVM_COMPONENT_DEPENDS
                               ${ASL_LLVM_COMPONENT_DEPENDS}
                             LINK_FLAGS
