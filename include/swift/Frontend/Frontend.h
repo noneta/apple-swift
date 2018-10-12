@@ -420,7 +420,7 @@ public:
 
   DiagnosticEngine &getDiags() { return Diagnostics; }
 
-  clang::vfs::FileSystem &getFileSystem() { return *SourceMgr.getFileSystem(); }
+  llvm::vfs::FileSystem &getFileSystem() { return *SourceMgr.getFileSystem(); }
 
   ASTContext &getASTContext() {
     return *Context;

@@ -41,7 +41,7 @@ SerializedModuleLoader::SerializedModuleLoader(ASTContext &ctx,
 SerializedModuleLoader::~SerializedModuleLoader() = default;
 
 static std::error_code
-openModuleFiles(clang::vfs::FileSystem &FS,
+openModuleFiles(llvm::vfs::FileSystem &FS,
                 StringRef DirName, StringRef ModuleFilename,
                 StringRef ModuleDocFilename,
                 std::unique_ptr<llvm::MemoryBuffer> *ModuleBuffer,

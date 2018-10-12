@@ -182,8 +182,8 @@ bool CompilerInstance::setup(const CompilerInvocation &Invok) {
 
 static bool loadAndValidateVFSOverlay(
     const std::string &File,
-    const llvm::IntrusiveRefCntPtr<clang::vfs::FileSystem> &BaseFS,
-    const llvm::IntrusiveRefCntPtr<clang::vfs::OverlayFileSystem> &OverlayFS,
+    const llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> &BaseFS,
+    const llvm::IntrusiveRefCntPtr<llvm::vfs::OverlayFileSystem> &OverlayFS,
     DiagnosticEngine &Diag) {
   // FIXME: It should be possible to allow chained lookup of later VFS overlays
   // through the mapping defined by earlier overlays.
@@ -195,8 +195,7 @@ static bool loadAndValidateVFSOverlay(
     return true;
   }
 
-  auto VFS = clang::vfs::getVFSFromYAML(std::move(Buffer.get()),
-                                        nullptr, File);
+  auto VFS = llvm::vfs::getVFSFromYAML(std::move(Buffer.get()), nullptr, File);
   if (!VFS) {
     Diag.diagnose(SourceLoc(), diag::invalid_vfs_overlay_file, File);
     return true;
@@ -206,9 +205,9 @@ static bool loadAndValidateVFSOverlay(
 }
 
 bool CompilerInstance::setUpVirtualFileSystemOverlays() {
-  auto BaseFS = clang::vfs::getRealFileSystem();
-  auto OverlayFS = llvm::IntrusiveRefCntPtr<clang::vfs::OverlayFileSystem>(
-                    new clang::vfs::OverlayFileSystem(BaseFS));
+  auto BaseFS = llvm::vfs::getRealFileSystem();
+  auto OverlayFS = llvm::IntrusiveRefCntPtr<llvm::vfs::OverlayFileSystem>(
+      new llvm::vfs::OverlayFileSystem(BaseFS));
   bool hadAnyFailure = false;
   for (const auto &File : Invocation.getSearchPathOptions().VFSOverlayFiles) {
     hadAnyFailure |=
