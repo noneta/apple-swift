@@ -48,7 +48,7 @@ static swift::version::Version InterfaceFormatVersion({1, 0});
 
 static bool
 extractSwiftInterfaceVersionAndArgs(DiagnosticEngine &Diags,
-                                    clang::vfs::FileSystem &FS,
+                                    llvm::vfs::FileSystem &FS,
                                     StringRef SwiftInterfacePathIn,
                                     swift::version::Version &Vers,
                                     llvm::StringSaver &SubArgSaver,
@@ -81,7 +81,7 @@ extractSwiftInterfaceVersionAndArgs(DiagnosticEngine &Diags,
 }
 
 static std::unique_ptr<llvm::MemoryBuffer>
-getBufferOfDependency(clang::vfs::FileSystem &FS,
+getBufferOfDependency(llvm::vfs::FileSystem &FS,
                       StringRef ModulePath, StringRef DepPath,
                       DiagnosticEngine &Diags) {
   auto DepBuf = FS.getBufferForFile(DepPath, /*FileSize=*/-1,
@@ -174,7 +174,7 @@ ParseableInterfaceModuleLoader::configureSubInvocationAndOutputPaths(
 // Check that the output .swiftmodule file is at least as new as all the
 // dependencies it read when it was built last time.
 static bool
-swiftModuleIsUpToDate(clang::vfs::FileSystem &FS,
+swiftModuleIsUpToDate(llvm::vfs::FileSystem &FS,
                       StringRef ModuleCachePath,
                       StringRef OutPath,
                       DiagnosticEngine &Diags,
@@ -221,7 +221,7 @@ swiftModuleIsUpToDate(clang::vfs::FileSystem &FS,
 ///      out to avoid having to do recursive scanning when rechecking this
 ///      dependency in the future.
 static bool
-collectDepsForSerialization(clang::vfs::FileSystem &FS,
+collectDepsForSerialization(llvm::vfs::FileSystem &FS,
                             CompilerInstance &SubInstance,
                             StringRef InPath, StringRef ModuleCachePath,
                             SmallVectorImpl<FileDependency> &Deps,
@@ -274,7 +274,7 @@ collectDepsForSerialization(clang::vfs::FileSystem &FS,
 }
 
 static bool buildSwiftModuleFromSwiftInterface(
-    clang::vfs::FileSystem &FS, DiagnosticEngine &Diags,
+    llvm::vfs::FileSystem &FS, DiagnosticEngine &Diags,
     CompilerInvocation &SubInvocation, StringRef InPath, StringRef OutPath,
     StringRef ModuleCachePath, DependencyTracker *OuterTracker) {
   bool SubError = false;
@@ -374,7 +374,7 @@ static bool buildSwiftModuleFromSwiftInterface(
   return !RunSuccess || SubError;
 }
 
-static bool serializedASTLooksValidOrCannotBeRead(clang::vfs::FileSystem &FS,
+static bool serializedASTLooksValidOrCannotBeRead(llvm::vfs::FileSystem &FS,
                                                   StringRef ModPath) {
   auto ModBuf = FS.getBufferForFile(ModPath, /*FileSize=*/-1,
                                     /*RequiresNullTerminator=*/false);

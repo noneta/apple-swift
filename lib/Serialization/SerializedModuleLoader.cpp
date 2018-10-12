@@ -51,7 +51,7 @@ std::error_code SerializedModuleLoaderBase::openModuleFiles(
           (!ModuleBuffer && !ModuleDocBuffer)) &&
          "Module and Module Doc buffer must both be initialized or NULL");
 
-  clang::vfs::FileSystem &FS = *Ctx.SourceMgr.getFileSystem();
+  llvm::vfs::FileSystem &FS = *Ctx.SourceMgr.getFileSystem();
 
   // Try to open the module file first.  If we fail, don't even look for the
   // module documentation file.
@@ -60,12 +60,12 @@ std::error_code SerializedModuleLoaderBase::openModuleFiles(
   // If there are no buffers to load into, simply check for the existence of
   // the module file.
   if (!(ModuleBuffer || ModuleDocBuffer)) {
-    llvm::ErrorOr<clang::vfs::Status> statResult = FS.status(Scratch);
+    llvm::ErrorOr<llvm::vfs::Status> statResult = FS.status(Scratch);
     if (!statResult)
       return statResult.getError();
     if (!statResult->exists())
       return std::make_error_code(std::errc::no_such_file_or_directory);
-    // FIXME: clang::vfs::FileSystem doesn't give us information on whether or
+    // FIXME: llvm::vfs::FileSystem doesn't give us information on whether or
     // not we can /read/ the file without actually trying to do so.
     return std::error_code();
   }
@@ -110,11 +110,11 @@ std::error_code SerializedModuleLoader::openModuleFiles(
 bool SerializedModuleLoader::maybeDiagnoseArchitectureMismatch(
     SourceLoc sourceLocation, StringRef moduleName, StringRef archName,
     StringRef directoryPath) {
-  clang::vfs::FileSystem &fs = *Ctx.SourceMgr.getFileSystem();
+  llvm::vfs::FileSystem &fs = *Ctx.SourceMgr.getFileSystem();
 
   std::error_code errorCode;
   std::string foundArchs;
-  for (clang::vfs::directory_iterator directoryIterator =
+  for (llvm::vfs::directory_iterator directoryIterator =
            fs.dir_begin(directoryPath, errorCode), endIterator;
        directoryIterator != endIterator;
        directoryIterator.increment(errorCode)) {
@@ -183,7 +183,7 @@ SerializedModuleLoaderBase::findModule(AccessPathElem moduleID,
 
     currPath = path;
     llvm::sys::path::append(currPath, moduleFilename.str());
-    llvm::ErrorOr<clang::vfs::Status> statResult = fs.status(currPath);
+    llvm::ErrorOr<llvm::vfs::Status> statResult = fs.status(currPath);
 
     if (statResult && statResult->isDirectory()) {
       // A .swiftmodule directory contains architecture-specific files.
