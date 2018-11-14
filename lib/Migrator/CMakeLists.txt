@@ -50,7 +50,8 @@ add_swift_host_library(swiftMigrator STATIC
   MigrationState.cpp
   OptionalTryMigratorPass.cpp
   RewriteBufferEditsReceiver.cpp
-  LINK_LIBRARIES swiftSyntax swiftIDE)
+  LINK_LIBS
+    swiftSyntax swiftIDE)
 
 add_dependencies(swiftMigrator
   "symlink_migrator_data")
