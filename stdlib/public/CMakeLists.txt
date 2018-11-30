@@ -72,3 +72,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     add_subdirectory(SDK)
   endif()
 endif()
+
+if(WINDOWS IN_LIST SWIFT_SDKS)
+  add_subdirectory(SDK/Windows)
+endif()
+
