@@ -174,8 +174,11 @@ if (DOXYGEN_FOUND)
     add_dependencies(doxygen doxygen-swift)
   endif()
 
-  swift_install_in_component(dev
-      DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/doxygen/html"
-      DESTINATION "docs/html")
+  if(NOT LLVM_INSTALL_TOOLCHAIN_ONLY)
+    install(DIRECTORY
+              ${CMAKE_CURRENT_BINARY_DIR}/doxygen/html/.
+            COMPONENT swift-doxygen-html
+            DESTINATION docs/html)
+  endif()
 endif()
 endif()

@@ -1348,16 +1348,26 @@ function(add_swift_host_library name)
     target_compile_options(${name} PRIVATE "-O2")
   endif()
 
-  swift_install_in_component(dev
-    TARGETS ${name}
-    ARCHIVE DESTINATION lib${LLVM_LIBDIR_SUFFIX}
-    LIBRARY DESTINATION lib${LLVM_LIBDIR_SUFFIX}
-    RUNTIME DESTINATION bin)
+  if(TARGET ${name})
+    if(NOT LLVM_INSTALL_TOOLCHAIN_ONLY)
+      if(${name} IN_LIST LLVM_DISTRIBUTION_COMPONENTS OR
+          NOT LLVM_DISTRIBUTION_COMPONENTS)
+        set(export_to_swifttargets EXPORT SwiftTargets)
+        set_property(GLOBAL PROPERTY SWIFT_HAS_EXPORTS True)
+      endif()
 
-  swift_is_installing_component(dev is_installing)
-  if(NOT is_installing)
-    set_property(GLOBAL APPEND PROPERTY SWIFT_BUILDTREE_EXPORTS ${name})
-  else()
+      install(TARGETS ${name}
+        COMPONENT ${name}
+        ${export_to_swifttargets}
+        ARCHIVE DESTINATION lib${LLVM_LIBDIR_SUFFIX}
+        LIBRARY DESTINATION lib${LLVM_LIBDIR_SUFFIX}
+        RUNTIME DESTINATION bin)
+      if(NOT CMAKE_CONFIGURATION_TYPES)
+        add_llvm_install_targets(install-${name}
+                                 DEPENDS ${name}
+                                 COMPONENT ${name})
+      endif()
+    endif()
     set_property(GLOBAL APPEND PROPERTY SWIFT_EXPORTS ${name})
   endif()
 endfunction()
@@ -2311,32 +2321,25 @@ macro(add_swift_lib_subdirectory name)
 endmacro()
 
 function(add_swift_host_tool executable)
-  set(options)
-  set(single_parameter_options SWIFT_COMPONENT)
-  set(multiple_parameter_options)
+  add_llvm_executable(${executable} ${ARGN})
 
-  cmake_parse_arguments(ASHT
-    "${options}"
-    "${single_parameter_options}"
-    "${multiple_parameter_options}"
-    ${ARGN})
-
-  # Create the executable rule.
-  add_llvm_executable(${executable}
-    ${ASHT_UNPARSED_ARGUMENTS})
-
-  # And then create the install rule if we are asked to.
-  if (ASHT_SWIFT_COMPONENT)
-    swift_install_in_component(${ASHT_SWIFT_COMPONENT}
-      TARGETS ${executable}
-      RUNTIME DESTINATION bin)
-
-    swift_is_installing_component(${ASHT_SWIFT_COMPONENT} is_installing)
-    if(NOT is_installing)
-      set_property(GLOBAL APPEND PROPERTY SWIFT_BUILDTREE_EXPORTS ${executable})
-    else()
-      set_property(GLOBAL APPEND PROPERTY SWIFT_EXPORTS ${executable})
+  if(SWIFT_INCLUDE_TOOLS)
+    if(${executable} IN_LIST LLVM_DISTRIBUTION_COMPONENTS OR
+        NOT LLVM_DISTRIBUTION_COMPONENTS)
+      set(export_to_swifttargets EXPORT SwiftTargets)
+      set_property(GLOBAL PROPERTY SWIFT_HAS_EXPORTS True)
     endif()
+
+    install(TARGETS ${executable}
+      ${export_to_swifttargets}
+      RUNTIME DESTINATION bin
+      COMPONENT ${executable})
+    if(NOT CMAKE_CONFIGURATION_TYPES)
+      add_llvm_install_targets(install-${executable}
+                               DEPENDS ${executable}
+                               COMPONENT ${executable})
+    endif()
+    set_property(GLOBAL APPEND PROPERTY SWIFT_EXPORTS ${executable})
   endif()
 endfunction()
 
@@ -2353,7 +2356,7 @@ function(add_swift_fuzzer_host_tool executable)
   target_link_libraries(${executable} PRIVATE "-fsanitize=fuzzer")
 endfunction()
 
-macro(add_swift_tool_symlink name dest component)
+macro(add_swift_tool_symlink name dest)
   add_llvm_tool_symlink(${name} ${dest} ALWAYS_GENERATE)
-  llvm_install_symlink(${name} ${dest} ALWAYS_GENERATE COMPONENT ${component})
+  llvm_install_symlink(${name} ${dest} ALWAYS_GENERATE)
 endmacro()

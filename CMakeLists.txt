@@ -948,9 +948,16 @@ endif()
 
 add_subdirectory(cmake/modules)
 
-swift_install_in_component(license
-  FILES "LICENSE.txt"
-  DESTINATION "share/swift")
+install(FILES
+          LICENSE.txt
+        DESTINATION
+          share/swift
+        COMPONENT license)
+if(NOT CMAKE_CONFIGURATION_TYPES)
+  add_llvm_install_targets(install-license
+                           DEPENDS LICENSE.txt
+                           COMPONENT license)
+endif()
 
 # Add a documentation target so that documentation shows up in the
 # Xcode project.

@@ -51,28 +51,6 @@ set(sources
 
   module.modulemap
   )
-set(output_dir "${SWIFTLIB_DIR}/shims")
-
-add_custom_command(
-    OUTPUT "${output_dir}"
-    COMMAND ${CMAKE_COMMAND} "-E" "make_directory" "${output_dir}")
-set(outputs)
-foreach(input ${sources})
-  add_custom_command(
-      OUTPUT "${output_dir}/${input}"
-      DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${input}"
-      COMMAND
-        "${CMAKE_COMMAND}" "-E" "copy_if_different"
-        "${CMAKE_CURRENT_SOURCE_DIR}/${input}"
-        "${output_dir}/${input}")
-  list(APPEND outputs "${output_dir}/${input}")
-endforeach()
-# Put the output dir itself last so that it isn't considered the primary output.
-list(APPEND outputs "${output_dir}")
-
-add_custom_target("copy_shim_headers"
-    DEPENDS "${outputs}"
-    COMMENT "Copying SwiftShims module to ${output_dir}")
 
 if ("${LLVM_PACKAGE_VERSION}" STREQUAL "")
   message(FATAL_ERROR
@@ -106,51 +84,53 @@ function(find_llvm_clang_headers suffix description out_var)
 endfunction()
 
 if(SWIFT_BUILT_STANDALONE)
-  find_llvm_clang_headers("/clang/${CLANG_VERSION}" "Clang"
-    clang_headers_location)
+  find_llvm_clang_headers("/clang/${CLANG_VERSION}" "Clang" clang_headers_location)
 else() # NOT SWIFT_BUILT_STANDALONE
   set(clang_headers_location "${LLVM_LIBRARY_DIR}/clang/${CLANG_VERSION}")
 endif()
 
-if("${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
-  set(cmake_symlink_option "copy_directory")
-else()
-  set(cmake_symlink_option "create_symlink")
+add_custom_command_target(unused_var
+                          OUTPUT
+                            ${SWIFTLIB_DIR}/clang
+                          CUSTOM_TARGET_NAME
+                            swift-clang-headers-symlink
+                          COMMAND
+                            ${CMAKE_COMMAND} -E make_directory ${SWIFTLIB_DIR}
+                          COMMAND
+                            ${CMAKE_COMMAND} -E copy_directory ${clang_headers_location} ${SWIFTLIB_DIR}/clang)
+add_custom_command_target(unused_var
+                          OUTPUT
+                            ${SWIFTLIB_DIR}/shims
+                          CUSTOM_TARGET_NAME
+                            swift-shim-headers
+                          COMMAND
+                            ${CMAKE_COMMAND} -E make_directory ${SWIFTLIB_DIR}/shims
+                          COMMAND
+                            ${CMAKE_COMMAND} -E copy_if_different ${sources} ${SWIFTLIB_DIR}/shims/
+                          WORKING_DIRECTORY
+                            ${CMAKE_CURRENT_SOURCE_DIR}
+                          DEPENDS
+                            ${sources})
+add_custom_target(swift-headers ALL
+                  DEPENDS ${SWIFTLIB_DIR}/shims)
+install(FILES
+          ${sources}
+        COMPONENT swift-headers
+        PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
+        DESTINATION lib/swift/shims)
+if(NOT CMAKE_CONFIGURATION_TYPES)
+  add_llvm_install_targets(install-swift-headers
+                           DEPENDS swift-headers
+                           COMPONENT swift-headers)
 endif()
 
-add_custom_command_target(unused_var
-    COMMAND
-      "${CMAKE_COMMAND}" "-E" "make_directory" "${SWIFTLIB_DIR}"
-    COMMAND
-      "${CMAKE_COMMAND}" "-E" "${cmake_symlink_option}"
-      "${clang_headers_location}"
-      "${SWIFTLIB_DIR}/clang"
-
-    CUSTOM_TARGET_NAME "symlink_clang_headers"
-    OUTPUT "${SWIFTLIB_DIR}/clang"
-    COMMENT "Symlinking Clang resource headers into ${SWIFTLIB_DIR}/clang")
-add_dependencies(copy_shim_headers symlink_clang_headers)
-
-swift_install_in_component(compiler
-    FILES ${sources}
-    DESTINATION "lib/swift/shims")
-
-# Install Clang headers under the Swift library so that an installed Swift's
-# module importer can find the compiler headers corresponding to its Clang.
-swift_install_in_component(clang-builtin-headers
-    DIRECTORY "${clang_headers_location}/"
-    DESTINATION "lib/swift/clang"
-    PATTERN "*.h")
-
-swift_install_symlink_component(clang-resource-dir-symlink
-  LINK_NAME clang
-  TARGET ../clang/${CLANG_VERSION}
-  DESTINATION "lib/swift")
-
-# Possibly install Clang headers under Clang's resource directory in case we
-# need to use a different version of the headers than the installed Clang. This
-# should be used in conjunction with clang-resource-dir-symlink.
-swift_install_in_component(clang-builtin-headers-in-clang-resource-dir
-    DIRECTORY "${SWIFT_PATH_TO_CLANG_BUILD}/lib/clang"
-    DESTINATION "lib"
-    PATTERN "*.h")
+add_custom_target(swift-clang-resource-dir-symlink ALL
+                  DEPENDS ${SWIFTLIB_DIR}/clang)
+install(CODE
+          "execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${clang_headers_location} $ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib${LLVM_LIBDIR_SUFFIX}/swift/clang)"
+        COMPONENT swift-clang-resource-dir-symlink)
+if(NOT CMAKE_CONFIGURATION_TYPES)
+  add_llvm_install_targets(install-swift-clang-resource-dir-symlink
+                           DEPENDS swift-clang-resource-dir-symlink
+                           COMPONENT swift-clang-resource-dir-symlink)
+endif()
