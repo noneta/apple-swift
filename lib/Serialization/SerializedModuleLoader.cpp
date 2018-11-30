@@ -120,7 +120,7 @@ bool SerializedModuleLoader::maybeDiagnoseArchitectureMismatch(
        directoryIterator.increment(errorCode)) {
     if (errorCode)
       return false;
-    StringRef filePath = directoryIterator->getName();
+    StringRef filePath = directoryIterator->path();
     StringRef extension = llvm::sys::path::extension(filePath);
     if (file_types::lookupTypeForExtension(extension) ==
           file_types::TY_SwiftModuleFile) {
