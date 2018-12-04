@@ -151,3 +151,43 @@ function(swift_install_symlink_component component)
   install(SCRIPT ${INSTALL_SYMLINK}
           CODE "install_symlink(${ARG_LINK_NAME} ${ARG_TARGET} ${ARG_DESTINATION})")
 endfunction()
+
+function(swift_expand_components)
+  foreach(component ${SWIFT_INSTALL_COMPONENTS})
+    if(component STREQUAL tools)
+      list(APPEND SWIFT_TOOLS
+           complete-test
+           sourcekitd-repl
+           sourcekitd-test
+           lldb-moduleimport-test
+           sil-func-extractor
+           sil-llvm-gen
+           sil-nm
+           sil-opt
+           sil-passpipeline-dumper
+           swift-api-digester
+           swift-demangle-yamldump
+           swift-ide-test
+           swift-llvm-opt
+           swift-refactor
+           swift-reflection-dump
+           swift-remoteast-test
+           swift-syntax-test
+           swift-api-dump)
+    elseif(component STREQUAL compiler)
+      list(APPEND SWIFT_TOOLS
+           swift
+           swift-demangle
+           swift-demangle-fuzzer
+           swift-stdlib-tool)
+    else()
+      continue()
+    endif()
+
+    list(REMOVE_ITEM SWIFT_INSTALL_COMPONENTS ${component})
+  endforeach()
+
+  list(REMOVE_DUPLICATES SWIFT_TOOLS)
+  set(SWIFT_TOOLS "${SWIFT_TOOLS}" CACHE STRING "" FORCE)
+endfunction()
+

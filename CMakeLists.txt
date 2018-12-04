@@ -439,12 +439,14 @@ include(CMakePushCheckState)
 print_versions()
 
 include(SwiftComponents)
+
+swift_expand_components()
+
 include(SwiftHandleGybSources)
 include(SwiftSetIfArchBitness)
 include(SwiftSource)
 include(AddSwift)
 include(SwiftConfigureSDK)
-include(SwiftComponents)
 include(SwiftList)
 
 # Configure swift include, install, build components.

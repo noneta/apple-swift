@@ -38,9 +38,15 @@ add_custom_target("symlink_migrator_data"
     DEPENDS "${output_dir}" "${outputs}"
     COMMENT "Symlinking migrator data to ${output_dir}")
 
-swift_install_in_component(compiler
-  FILES ${datafiles}
-DESTINATION "lib/swift/migrator")
+install(FILES
+          ${datafiles}
+        DESTINATION lib/swift/migrator
+        COMPONENT swift-migrator-data)
+if(NOT CMAKE_CONFIGURATION_TYPES)
+  add_llvm_install_targets(install-swift-migrator-data
+                           DEPENDS ${datafiles}
+                           COMPONENT swift-migrator-data)
+endif()
 
 add_swift_host_library(swiftMigrator STATIC
   APIDiffMigratorPass.cpp

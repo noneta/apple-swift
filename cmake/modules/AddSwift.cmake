@@ -2385,36 +2385,29 @@ macro(add_swift_lib_subdirectory name)
 endmacro()
 
 function(add_swift_host_tool executable)
-  set(ADDSWIFTHOSTTOOL_multiple_parameter_options
-        SWIFT_COMPONENT)
+  add_swift_executable(${executable} ${ARGN})
+  set_target_properties(${executable} PROPERTIES FOLDER "Swift Tools")
 
-  cmake_parse_arguments(
-      ADDSWIFTHOSTTOOL # prefix
-      "" # options
-      "" # single-value args
-      "${ADDSWIFTHOSTTOOL_multiple_parameter_options}" # multi-value args
-      ${ARGN})
+  if(SWIFT_BUILD_TOOLS)
+    if(${executable} IN_LIST SWIFT_TOOLS OR NOT LLVM_INSTALL_TOOLCHAIN_ONLY)
+      if(${executable} IN_LIST LLVM_DISTRIBUTION_COMPONENTS OR
+         NOT LLVM_DISTRIBUTION_COMPONENTS)
+        set(export_to_swiftexports EXPORT SwiftExports)
+        set_property(GLOBAL PROPERTY SWIFT_HAS_EXPORTS True)
+      endif()
 
-  # Create the executable rule.
-  add_swift_executable(
-    ${executable} 
-    ${ADDSWIFTHOSTTOOL_UNPARSED_ARGUMENTS}
-  )
-
-  # And then create the install rule if we are asked to.
-  if (ADDSWIFTHOSTTOOL_SWIFT_COMPONENT)
-    swift_install_in_component(${ADDSWIFTHOSTTOOL_SWIFT_COMPONENT}
-      TARGETS ${executable}
-      RUNTIME DESTINATION bin)
-
-    swift_is_installing_component(${ADDSWIFTHOSTTOOL_SWIFT_COMPONENT}
-      is_installing)
-  
-    if(NOT is_installing)
-      set_property(GLOBAL APPEND PROPERTY SWIFT_BUILDTREE_EXPORTS ${executable})
-    else()
-      set_property(GLOBAL APPEND PROPERTY SWIFT_EXPORTS ${executable})
+      install(TARGETS ${executable}
+              ${export_to_swiftexports}
+              RUNTIME DESTINATION bin
+              COMPONENT ${executable})
+      if(NOT CMAKE_CONFIGURATION_TYPES)
+        add_llvm_install_targets(install-${executable}
+                                 DEPENDS ${executable}
+                                 COMPONENT ${executable})
+      endif()
     endif()
+
+    set_property(GLOBAL APPEND PROPERTY SWIFT_EXPORTS ${executable})
   endif()
 endfunction()
 
