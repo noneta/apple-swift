@@ -5,9 +5,15 @@ swift_install_in_component(editor-integration
     FILES swift-mode.el
     DESTINATION "share/emacs/site-lisp")
 
-swift_install_in_component(tools
-    FILES swift-api-dump.py
-    DESTINATION bin)
+install(PROGRAMS
+          swift-api-dump.py
+        DESTINATION bin
+        COMPONENT swift-api-dump)
+if(NOT CMAKE_CONFIGURATION_TYPES)
+  add_llvm_install_targets(install-swift-api-dump
+                           DEPENDS swift-api-dump.py
+                           COMPONENT swift-api-dump)
+endif()
 
 # We install LLVM's FileCheck, if requested.
 swift_install_in_component(toolchain-dev-tools

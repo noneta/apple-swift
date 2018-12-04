@@ -27,7 +27,13 @@ if(HAVE_UNICODE_LIBEDIT)
       LINK_FLAGS " -fprofile-instr-generate -fcoverage-mapping")
   endif()
 
-  swift_install_in_component(tools
-      TARGETS sourcekitd-repl
-      RUNTIME DESTINATION bin)
+  install(TARGETS
+            sourcekitd-repl
+          RUNTIME DESTINATION bin
+          COMPONENT sourcekitd-repl)
+  if(NOT CMAKE_CONFIGURATION_TYPES)
+    add_llvm_install_targets(install-sourcekitd-repl
+                             DEPENDS sourcekitd-repl
+                             COMPONENT sourcekitd-repl)
+  endif()
 endif()

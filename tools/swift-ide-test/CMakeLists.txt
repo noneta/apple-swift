@@ -2,7 +2,6 @@ add_swift_host_tool(swift-ide-test
   swift-ide-test.cpp
   ModuleAPIDiff.cpp
   XMLValidator.cpp
-  SWIFT_COMPONENT tools
 )
 target_link_libraries(swift-ide-test
                       PRIVATE

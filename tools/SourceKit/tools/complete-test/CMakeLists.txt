@@ -24,6 +24,13 @@ if(SWIFT_ANALYZE_CODE_COVERAGE)
     LINK_FLAGS " -fprofile-instr-generate -fcoverage-mapping")
 endif()
 
-swift_install_in_component(tools
-    TARGETS complete-test
-    RUNTIME DESTINATION bin)
+install(TARGETS
+          complete-test
+        RUNTIME DESTINATION bin
+        COMPONENT complete-test)
+if(NOT CMAKE_CONFIGURATION_TYPES)
+  add_llvm_install_targets(install-complete-test
+                           DEPENDS complete-test
+                           COMPONENT complete-test)
+endif()
+

@@ -131,9 +131,16 @@ add_custom_command_target(unused_var
     COMMENT "Symlinking Clang resource headers into ${SWIFTLIB_DIR}/clang")
 add_dependencies(copy_shim_headers symlink_clang_headers)
 
-swift_install_in_component(compiler
-    FILES ${sources}
-    DESTINATION "lib/swift/shims")
+install(FILES
+          ${sources}
+        PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
+        DESTINATION lib/swift/shims
+        COMPONENT swift-shims)
+if(NOT CMAKE_CONFIGURATION_TYPES)
+  add_llvm_install_targets(install-swift-shims
+                           DEPENDS ${sources}
+                           COMPONENT swift-shims)
+endif()
 
 # Install Clang headers under the Swift library so that an installed Swift's
 # module importer can find the compiler headers corresponding to its Clang.

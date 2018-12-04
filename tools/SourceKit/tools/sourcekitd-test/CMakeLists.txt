@@ -32,6 +32,12 @@ if(SWIFT_ANALYZE_CODE_COVERAGE)
     LINK_FLAGS " -fprofile-instr-generate -fcoverage-mapping")
 endif()
 
-swift_install_in_component(tools
-    TARGETS sourcekitd-test
-    RUNTIME DESTINATION bin)
+install(TARGETS
+          sourcekitd-test
+        RUNTIME DESTINATION bin
+        COMPONENT sourcekitd-test)
+if(NOT CMAKE_CONFIGURATION_TYPES)
+  add_llvm_install_targets(install-sourcekitd-test
+                           DEPENDS sourcekitd-test
+                           COMPONENT sourcekitd-test)
+endif()
