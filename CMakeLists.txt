@@ -171,6 +171,14 @@ endif()
 
 set(SWIFT_STDLIB_BUILD_TYPE "${CMAKE_BUILD_TYPE}" CACHE STRING
     "Build type for the Swift standard library and SDK overlays [Debug, RelWithDebInfo, Release, MinSizeRel]")
+# Allow the user to specify the standard library CMAKE_MSVC_RUNTIME_LIBRARY
+# value.  The following values are valid:
+#   - MultiThreaded (/MT)
+#   - MultiThreadedDebug (/MTd)
+#   - MultiThreadedDLL (/MD)
+#   - MultiThreadedDebugDLL (/MDd)
+set(SWIFT_STDLIB_MSVC_RUNTIME_LIBRARY MultiThreaded$<$<CONFIG:Debug>:Debug>DLL
+  CACHE STRING "MSVC Runtime Library for the standard library")
 set_property(CACHE SWIFT_STDLIB_BUILD_TYPE PROPERTY
     STRINGS "Debug" "RelWithDebInfo" "Release" "MinSizeRel")
 

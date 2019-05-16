@@ -1650,6 +1650,22 @@ void Driver::buildOutputInfo(const ToolChain &TC, const DerivedArgList &Args,
 
   }
 
+  if (TC.getTriple().isOSWindows()) {
+    if (const Arg *A = Args.getLastArg(options::OPT_libc)) {
+      OI.RuntimeVariant =
+          llvm::StringSwitch<Optional<OutputInfo::MSVCRuntime>>(A->getValue())
+              .Case("MD", OutputInfo::MSVCRuntime::MultiThreadedDLL)
+              .Case("MDd", OutputInfo::MSVCRuntime::MultiThreadedDebugDLL)
+              .Case("MT", OutputInfo::MSVCRuntime::MultiThreaded)
+              .Case("MTd", OutputInfo::MSVCRuntime::MultiThreadedDebug)
+              .Default(llvm::None);
+      if (!OI.RuntimeVariant)
+        Diags.diagnose({}, diag::error_invalid_arg_value, A->getSpelling(),
+                       A->getValue());
+    } else {
+      Diags.diagnose({}, diag::error_missing_arg_value, "-libc", 1);
+    }
+  }
 }
 
 OutputInfo::Mode

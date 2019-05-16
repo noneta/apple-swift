@@ -282,6 +282,36 @@ ToolChain::constructInvocation(const CompileJobAction &job,
 
   context.addFrontendInputAndOutputArguments(Arguments, II.FilelistInfos);
 
+  if (context.OI.RuntimeVariant) {
+    OutputInfo::MSVCRuntime RT = context.OI.RuntimeVariant.getValue();
+
+    Arguments.push_back("-autolink-library");
+    Arguments.push_back("oldnames");
+
+    Arguments.push_back("-autolink-library");
+    switch (RT) {
+    case OutputInfo::MSVCRuntime::MultiThreaded:
+    case OutputInfo::MSVCRuntime::MultiThreadedDebug:
+      Arguments.push_back(RT == OutputInfo::MSVCRuntime::MultiThreaded
+                              ? "libcmt"
+                              : "libcmtd");
+      break;
+    case OutputInfo::MSVCRuntime::MultiThreadedDLL:
+    case OutputInfo::MSVCRuntime::MultiThreadedDebugDLL:
+      Arguments.push_back(RT == OutputInfo::MSVCRuntime::MultiThreadedDLL
+                              ? "msvcrt"
+                              : "msvcrtd");
+
+      Arguments.push_back("-Xcc");
+      Arguments.push_back("-D_DLL");
+      break;
+    }
+
+    // NOTE(compnerd) we do not support /ML and /MLd
+    Arguments.push_back("-Xcc");
+    Arguments.push_back("-D_MT");
+  }
+
   // Forward migrator flags.
   if (auto DataPath =
           context.Args.getLastArg(options::OPT_api_diff_data_file)) {
