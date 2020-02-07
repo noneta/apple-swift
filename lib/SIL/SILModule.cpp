@@ -13,6 +13,7 @@
 #define DEBUG_TYPE "sil-module"
 #include "swift/SIL/SILModule.h"
 #include "Linker.h"
+#include "swift/AST/ASTMangler.h"
 #include "swift/AST/GenericEnvironment.h"
 // SWIFT_ENABLE_TENSORFLOW
 #include "swift/AST/ASTMangler.h"
@@ -610,6 +611,7 @@ SILModule::lookUpDifferentiabilityWitnessesForFunction(StringRef name) {
   return DifferentiabilityWitnessesByFunction[name];
 }
 
+// SWIFT_ENABLE_TENSORFLOW
 bool SILModule::loadDifferentiabilityWitness(SILDifferentiabilityWitness *W) {
   auto *NewW = getSILLoader()->lookupDifferentiabilityWitness(W->getKey());
   if (!NewW)
@@ -618,6 +620,7 @@ bool SILModule::loadDifferentiabilityWitness(SILDifferentiabilityWitness *W) {
   assert(W == NewW);
   return true;
 }
+// SWIFT_ENABLE_TENSORFLOW END
 
 void SILModule::registerDeserializationNotificationHandler(
     std::unique_ptr<DeserializationNotificationHandler> &&handler) {

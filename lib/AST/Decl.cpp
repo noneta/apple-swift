@@ -5398,6 +5398,7 @@ VarDecl::VarDecl(DeclKind kind, bool isStatic, VarDecl::Introducer introducer,
   Bits.VarDecl.IsLazyStorageProperty = false;
   Bits.VarDecl.HasNonPatternBindingInit = false;
   Bits.VarDecl.IsPropertyWrapperBackingProperty = false;
+  Bits.VarDecl.IsTopLevelGlobal = false;
 }
 
 Type VarDecl::getType() const {
@@ -5496,11 +5497,7 @@ bool VarDecl::isLazilyInitializedGlobal() const {
 
   // Top-level global variables in the main source file and in the REPL are not
   // lazily initialized.
-  auto sourceFileContext = dyn_cast<SourceFile>(getDeclContext());
-  if (!sourceFileContext)
-    return true;
-
-  return !sourceFileContext->isScriptMode();
+  return !isTopLevelGlobal();
 }
 
 SourceRange VarDecl::getSourceRange() const {
