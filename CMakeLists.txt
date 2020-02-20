@@ -265,23 +265,6 @@ set(SWIFT_ANDROID_DEPLOY_DEVICE_PATH "" CACHE STRING
   "Path on an Android device where build products will be pushed. These are used when running the test suite against the device")
 
 #
-# User-configurable ICU specific options for Android, FreeBSD, Linux and Haiku.
-#
-
-foreach(sdk ANDROID;FREEBSD;LINUX;WINDOWS;HAIKU)
-  foreach(arch aarch64;armv6;armv7;i686;powerpc64;powerpc64le;s390x;x86_64)
-    set(SWIFT_${sdk}_${arch}_ICU_UC "" CACHE STRING
-        "Path to a directory containing the icuuc library for ${sdk}")
-    set(SWIFT_${sdk}_${arch}_ICU_UC_INCLUDE "" CACHE STRING
-        "Path to a directory containing headers for icuuc for ${sdk}")
-    set(SWIFT_${sdk}_${arch}_ICU_I18N "" CACHE STRING
-        "Path to a directory containing the icui18n library for ${sdk}")
-    set(SWIFT_${sdk}_${arch}_ICU_I18N_INCLUDE "" CACHE STRING
-        "Path to a directory containing headers icui18n for ${sdk}")
-  endforeach()
-endforeach()
-
-#
 # User-configurable Darwin-specific options.
 #
 option(SWIFT_EMBED_BITCODE_SECTION
@@ -830,19 +813,7 @@ else()
   message(STATUS "")
 endif()
 
-if(SWIFT_BUILD_STDLIB OR SWIFT_BUILD_SDK_OVERLAY)
-  message(STATUS "Building Swift standard library and overlays for SDKs: ${SWIFT_SDKS}")
-  message(STATUS "  Build type:       ${SWIFT_STDLIB_BUILD_TYPE}")
-  message(STATUS "  Assertions:       ${SWIFT_STDLIB_ASSERTIONS}")
-  message(STATUS "")
-
-  message(STATUS "Building Swift runtime with:")
-  message(STATUS "  Leak Detection Checker Entrypoints: ${SWIFT_RUNTIME_ENABLE_LEAK_CHECKER}")
-  message(STATUS "")
-
-  message(STATUS "Differentiable Programming Support: ${SWIFT_ENABLE_EXPERIMENTAL_DIFFERENTIABLE_PROGRAMMING}")
-  message(STATUS "")
-else()
+if(NOT SWIFT_BUILD_STDLIB AND NOT SWIFT_BUILD_SDK_OVERLAY)
   message(STATUS "Not building Swift standard library, SDK overlays, and runtime")
   message(STATUS "")
 endif()
@@ -850,37 +821,6 @@ endif()
 #
 # Find required dependencies.
 #
-
-function(swift_icu_variables_set sdk arch result)
-  string(TOUPPER "${sdk}" sdk)
-
-  set(icu_var_ICU_UC_INCLUDE ${SWIFT_${sdk}_${arch}_ICU_UC_INCLUDE})
-  set(icu_var_ICU_UC ${SWIFT_${sdk}_${arch}_ICU_UC})
-  set(icu_var_ICU_I18N_INCLUDE ${SWIFT_${sdk}_${arch}_ICU_I18N_INCLUDE})
-  set(icu_var_ICU_I18N ${SWIFT_${sdk}_${arch}_ICU_I18N})
-
-  if(icu_var_ICU_UC_INCLUDE AND icu_var_ICU_UC AND
-     icu_var_ICU_I18N_INCLUDE AND icu_var_ICU_I18N)
-    set(${result} TRUE PARENT_SCOPE)
-  else()
-    set(${result} FALSE PARENT_SCOPE)
-  endif()
-endfunction()
-
-# ICU is provided through CoreFoundation on Darwin.  On other hosts, if the ICU
-# unicode and i18n include and library paths are not defined, perform a standard
-# package lookup.  Otherwise, rely on the paths specified by the user.  These
-# need to be defined when cross-compiling.
-if(NOT CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-  if(SWIFT_BUILD_STDLIB OR SWIFT_BUILD_SDK_OVERLAY)
-    swift_icu_variables_set("${SWIFT_PRIMARY_VARIANT_SDK}"
-                            "${SWIFT_PRIMARY_VARIANT_ARCH}"
-                            ICU_CONFIGURED)
-    if("${SWIFT_PATH_TO_LIBICU_BUILD}" STREQUAL "" AND NOT ${ICU_CONFIGURED})
-      find_package(ICU REQUIRED COMPONENTS uc i18n)
-    endif()
-  endif()
-endif()
 
 find_package(PythonInterp REQUIRED)
 
