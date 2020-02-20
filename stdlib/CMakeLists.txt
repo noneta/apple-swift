@@ -9,6 +9,78 @@ project(swift-stdlib LANGUAGES C CXX)
 list(APPEND CMAKE_MODULE_PATH
   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 
+#
+# User-configurable ICU specific options for Android, FreeBSD, Linux and Haiku.
+#
+
+foreach(sdk ANDROID;FREEBSD;LINUX;WINDOWS;HAIKU)
+  foreach(arch aarch64;armv6;armv7;i686;powerpc64;powerpc64le;s390x;x86_64)
+    set(SWIFT_${sdk}_${arch}_ICU_UC "" CACHE STRING
+        "Path to a directory containing the icuuc library for ${sdk}")
+    set(SWIFT_${sdk}_${arch}_ICU_UC_INCLUDE "" CACHE STRING
+        "Path to a directory containing headers for icuuc for ${sdk}")
+    set(SWIFT_${sdk}_${arch}_ICU_I18N "" CACHE STRING
+        "Path to a directory containing the icui18n library for ${sdk}")
+    set(SWIFT_${sdk}_${arch}_ICU_I18N_INCLUDE "" CACHE STRING
+        "Path to a directory containing headers icui18n for ${sdk}")
+  endforeach()
+endforeach()
+
+function(swift_icu_variables_set sdk arch result)
+  string(TOUPPER "${sdk}" sdk)
+
+  set(icu_var_ICU_UC_INCLUDE ${SWIFT_${sdk}_${arch}_ICU_UC_INCLUDE})
+  set(icu_var_ICU_UC ${SWIFT_${sdk}_${arch}_ICU_UC})
+  set(icu_var_ICU_I18N_INCLUDE ${SWIFT_${sdk}_${arch}_ICU_I18N_INCLUDE})
+  set(icu_var_ICU_I18N ${SWIFT_${sdk}_${arch}_ICU_I18N})
+
+  if(icu_var_ICU_UC_INCLUDE AND icu_var_ICU_UC AND
+     icu_var_ICU_I18N_INCLUDE AND icu_var_ICU_I18N)
+    set(${result} TRUE PARENT_SCOPE)
+  else()
+    set(${result} FALSE PARENT_SCOPE)
+  endif()
+endfunction()
+
+# ICU is provided through CoreFoundation on Darwin.  On other hosts, if the ICU
+# unicode and i18n include and library paths are not defined, perform a standard
+# package lookup.  Otherwise, rely on the paths specified by the user.  These
+# need to be defined when cross-compiling.
+if(NOT CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+  swift_icu_variables_set("${SWIFT_PRIMARY_VARIANT_SDK}"
+                          "${SWIFT_PRIMARY_VARIANT_ARCH}"
+                          ICU_CONFIGURED)
+  if("${SWIFT_PATH_TO_LIBICU_BUILD}" STREQUAL "" AND NOT ${ICU_CONFIGURED})
+    find_package(ICU REQUIRED COMPONENTS uc i18n)
+  endif()
+endif()
+
+message(STATUS "Building Swift runtime with:")
+message(STATUS "  Leak Detection Checker Entrypoints: ${SWIFT_RUNTIME_ENABLE_LEAK_CHECKER}")
+message(STATUS "")
+
+message(STATUS "Building Swift standard library and overlays")
+message(STATUS "  Build type:                         ${SWIFT_STDLIB_BUILD_TYPE}")
+message(STATUS "  Assertions:                         ${SWIFT_STDLIB_ASSERTIONS}")
+message(STATUS "  Differentiable Programming Support: ${SWIFT_ENABLE_EXPERIMENTAL_DIFFERENTIABLE_PROGRAMMING}")
+message(STATUS "")
+
+foreach(sdk ${SWIFT_SDKS})
+  foreach(arch ${SWIFT_SDK_${sdk}_ARCHITECTURES})
+    message(STATUS "Host ${sdk} ${arch}")
+    if(NOT sdk IN_LIST SWIFT_APPLE_PLATFORMS)
+      message(STATUS "  libc header path: ${SWIFT_SDK_${sdk}_ARCH_${arch}_LIBC_INCLUDE_DIRECTORY}")
+      message(STATUS "  libc architecture specific header path: ${SWIFT_SDK_${sdk}_ARCH_${arch}_LIBC_ARCHITECTURE_INCLUDE_DIRECTORY}")
+      message(STATUS "  ICU i18n INCLUDE: ${SWIFT_${sdk}_${arch}_ICU_I18N_INCLUDE}")
+      message(STATUS "  ICU i18n LIB: ${SWIFT_${sdk}_${arch}_ICU_I18N}")
+      message(STATUS "  ICU unicode INCLUDE: ${SWIFT_${sdk}_${arch}_ICU_UC_INCLUDE}")
+      message(STATUS "  ICU unicode LIB: ${SWIFT_${sdk}_${arch}_ICU_UC}")
+    endif()
+  endforeach()
+endforeach()
+
+message(STATUS "")
+
 include(AddSwiftStdlib)
 
 # Create convenience targets for the Swift standard library.
