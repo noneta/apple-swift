@@ -70,6 +70,10 @@ option(SWIFT_COMPILE_DIFFERENTIATION_WITHOUT_TGMATH
        "Build Differentation without tgmath (and dependency on platform runtime libraries)"
        FALSE)
 
+option(SWIFT_ENABLE_EXPERIMENTAL_STRUCTURAL
+  "Enable experimental Swift automatic requirement satisfication features"
+  FALSE)
+
 #
 # End of user-configurable options.
 #
