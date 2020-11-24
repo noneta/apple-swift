@@ -276,13 +276,6 @@ namespace swift {
     /// [TODO: Clang-type-plumbing] Turn on for feature rollout.
     bool UseClangFunctionTypes = false;
 
-    /// Whether to use the import as member inference system
-    ///
-    /// When importing a global, try to infer whether we can import it as a
-    /// member of some type instead. This includes inits, computed properties,
-    /// and methods.
-    bool InferImportAsMember = false;
-
     /// If set to true, compile with the SIL Opaque Values enabled.
     /// This is for bootstrapping. It can't be in SILOptions because the
     /// TypeChecker uses it to set resolve the ParameterConvention.
@@ -613,13 +606,6 @@ namespace swift {
     /// instead of dropped altogether when possible.
     bool ImportForwardDeclarations = false;
 
-    /// Whether to use the import as member inference system
-    ///
-    /// When importing a global, try to infer whether we can import it as a
-    /// member of some type instead. This includes inits, computed properties,
-    /// and methods.
-    bool InferImportAsMember = false;
-
     /// If true ignore the swift bridged attribute.
     bool DisableSwiftBridgeAttr = false;
 
@@ -652,7 +638,6 @@ namespace swift {
                           static_cast<uint8_t>(Mode),
                           DetailedPreprocessingRecord,
                           ImportForwardDeclarations,
-                          InferImportAsMember,
                           DisableSwiftBridgeAttr,
                           DisableOverlayModules);
     }
