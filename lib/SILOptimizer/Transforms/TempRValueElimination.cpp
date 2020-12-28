@@ -321,6 +321,12 @@ SILInstruction *TempRValueOptPass::getLastUseWhileSourceIsNotModified(
     if (useInsts.count(inst))
       ++numLoadsFound;
 
+    /*
+    if (auto *DAI = dyn_cast<DestroyAddrInst>(inst))
+      if (DAI->getOperand() == copySrc)
+        return nullptr;
+    */
+
     // If this is the last use of the temp we are ok. After this point,
     // modifications to the source don't matter anymore.
     // Note that we are assuming here that if an instruction loads and writes
@@ -482,6 +488,13 @@ bool TempRValueOptPass::tryOptimizeCopyIntoTemp(CopyAddrInst *copyInst) {
       aa->mayWriteToMemory(lastLoadInst, copySrc))
     return false;
 
+  llvm::dbgs() << "need to insert destroy: " << needToInsertDestroy << '\n'
+               << "lastLoadInst: " << *lastLoadInst
+               << "copyInst: " << *copyInst
+               << "copySrc: " << *copySrc
+               << "tempObj: " << *tempObj
+               << '\n';
+
   if (!isOSSA && !checkTempObjectDestroy(tempObj, copyInst))
     return false;
 
@@ -489,9 +502,44 @@ bool TempRValueOptPass::tryOptimizeCopyIntoTemp(CopyAddrInst *copyInst) {
 
   if (needToInsertDestroy) {
     // Compensate the [take] of the original copyInst.
-    SILBuilderWithScope::insertAfter(lastLoadInst, [&] (SILBuilder &builder) {
-      builder.createDestroyAddr(builder.getInsertionPoint()->getLoc(), copySrc);
-    });
+    llvm::dbgs() << "Before DestroyAddr added --" << '\n';
+    getFunction()->dump();
+    llvm::dbgs() << "-- Before DestroyAddr added" << '\n';
+
+    bool Inserted = false;
+    for (auto *Use : copySrc->getUses()) {
+      auto *User = Use->getUser();
+      llvm::dbgs() << "User: " << *User << '\n';
+      if (isa<DeallocStackInst>(User)) {
+        if (User->getParent() == copySrc->getDefiningInstruction()->getParent()) {
+          auto it = std::prev(User->getIterator());
+          SILBuilderWithScope::insertAfter(&*it, [&] (SILBuilder &builder) {
+            builder.createDestroyAddr(builder.getInsertionPoint()->getLoc(), copySrc);
+          });
+          Inserted = true;
+          break;
+        }
+      }
+    }
+
+    if (!Inserted) {
+      SILBuilderWithScope::insertAfter(lastLoadInst, [&] (SILBuilder &builder) {
+        builder.createDestroyAddr(builder.getInsertionPoint()->getLoc(), copySrc);
+      });
+    }
+
+    llvm::dbgs() << "After DestroyAddr added --" << '\n';
+    getFunction()->dump();
+    llvm::dbgs() << "-- After DestroyAddr added" << '\n';
+  } /*else {
+    // Need to make sure that the destroy_addr dominates the copy
+    return false;
+  } */
+
+  {
+    llvm::dbgs() << "Before Replacement --" << '\n';
+    getFunction()->dump();
+    llvm::dbgs() << "-- Before Replacement" << '\n';
   }
 
   // * Replace all uses of the tempObj with the copySrc.
@@ -541,6 +589,13 @@ bool TempRValueOptPass::tryOptimizeCopyIntoTemp(CopyAddrInst *copyInst) {
   }
 
   tempObj->eraseFromParent();
+
+  {
+    llvm::dbgs() << "After Replacement --" << '\n';
+    getFunction()->dump();
+    llvm::dbgs() << "-- After Replacement" << '\n';
+  }
+
   return true;
 }
 
@@ -699,6 +754,10 @@ void TempRValueOptPass::run() {
   aa = getPassManager()->getAnalysis<AliasAnalysis>();
   bool changed = false;
 
+  llvm::dbgs() << "Pristine --" << '\n';
+  getFunction()->getModule().dump();
+  llvm::dbgs() << "-- Pristine " << '\n';
+
   // Find all copy_addr instructions.
   llvm::SmallVector<CopyAddrInst *, 8> deadCopies;
   for (auto &block : *getFunction()) {
@@ -733,6 +792,10 @@ void TempRValueOptPass::run() {
     }
   }
 
+  llvm::dbgs() << "temporary copies removed --" << '\n';
+  getFunction()->getModule().dump();
+  llvm::dbgs() << "-- temporary copies removed" << '\n';
+
   // Delete the copies and any unused address operands.
   // The same copy may have been added multiple times.
   sortUnique(deadCopies);
@@ -755,6 +818,9 @@ void TempRValueOptPass::run() {
     }
   }
   if (changed) {
+    llvm::dbgs() << "items removed --" << '\n';
+    getFunction()->getModule().dump();
+    llvm::dbgs() << "-- items removed" << '\n';
     invalidateAnalysis(SILAnalysis::InvalidationKind::Instructions);
   }
 }
